@@ -1,8 +1,4 @@
-
 import { v2 as cloudinary } from 'cloudinary';
-
-
-
 
 
 cloudinary.config({ 
@@ -11,12 +7,19 @@ cloudinary.config({
             api_secret: process.env.CLOUDINARY_API_SECRET // Click 'View API Keys' above to copy your API secret
         });
 
+// cloudinary.v2.uploader.upload(
+//     'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', {
+//         public_id: 'shoes',
+//     },
+//     function(error,result){console.log(result);}
+// )
+
 const uploadOnCloudinary= async (localFilePath) => {
     try {
         if (!localFilePath) {
             return null;
-        //upload the file on cloudnary
         }
+        //upload the file on cloudnary
         const response = await cloudinary.uploader.upload(localFilePath,{
             resource_type:"auto"
         })
@@ -30,12 +33,8 @@ const uploadOnCloudinary= async (localFilePath) => {
     }
 }
 
-cloudinary.v2.uploader.upload(
-           'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', {
-               public_id: 'shoes',
-           },
-           function(error,result){console.log(result);}
-       )
+export { uploadOnCloudinary };
+
 
 
 // (async function() {
