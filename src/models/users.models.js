@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import mongoose, { Schema } from "mongoose";
 
-const userSchema = new userSchema({
+const userSchema = new Schema({
     userName: {
         type: String,
         required: true,
@@ -86,3 +86,17 @@ userSchema.methods.generateRefreshToken = function () {
 }
 
 export const User= mongoose.model("User", userSchema );
+
+// import mongoose from 'mongoose';
+
+// const schema = new mongoose.Schema({
+//     // Define your schema fields here
+//     name: String,
+//     email: String,
+//     password: String,
+//     // Add other fields as needed
+// });
+
+// const User = mongoose.model('User', schema);
+
+// export default User;
