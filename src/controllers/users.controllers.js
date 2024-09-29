@@ -7,7 +7,15 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 const generateRefreshTokenAndAccessTokens = async(userId) =>{
     try {
         const user = await User.findById(userId);
+        console.log("-------------------------------------------------");
+        
+        console.log("user:", user);
+        
         const accessToken = user.generateAccessToken();
+        console.log("-------------------------------------------------------------");
+        console.log("accessToken : ", accessToken);
+        
+
         const refreshToken= user.generateRefreshToken();
 
         user.refreshToken = refreshToken;
@@ -50,7 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new apiError(409,"User with UserName or Email already Exist..!");    
     }
 
-    console.log("response of req.files from ||users.controllers.js||: ", req.files);
+    // console.log("response of req.files from ||users.controllers.js||: ", req.files);
     
     const avatarLocalPath = req.files?.avatar[0]?.path;    
     // const coverImageLocalPath = req.files?.coverImage[0]?.path;
@@ -93,7 +101,7 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
-const logInUser = asyncHandler(async (req,res) => {
+const loggedInUser = asyncHandler(async (req,res) => {
     //req.body --> data
     //userName or Email
     //Check or Find the User.
@@ -101,15 +109,24 @@ const logInUser = asyncHandler(async (req,res) => {
     //if password true then Refresh token & Access Token.
     //send in Coockies Securely.
     //
-
+    console.log(req.body);
+    
     const { email, userName, password } = req.body;
-    if(!email || !userName){
+    if(!email && !userName){
         throw new apiError(400, "userName or Email is Required.");    
     }
+    //Here is an Alternative Logic of Above Logic.
+    // if(!(email || userName)){
+    //     throw new apiError(400, "userName or Email is Required.");    
+    // }
 
     const user = await User.findOne({
         $or : [{userName}, {email}]
     })
+    console.log("-------------------------------");
+    console.log(user);
+    
+    
 
     if (!user) {
         throw new apiError(404, "User does not exist.");
@@ -121,9 +138,11 @@ const logInUser = asyncHandler(async (req,res) => {
         
     }
 
-    const {accessToken, refreshToken}=await generateRefreshTokenAndAccessTokens(user._id);
-    const loggedInUser = await User.findById(userId).
+    const {accessToken, refreshToken} = await generateRefreshTokenAndAccessTokens(user._id);
+    const loggedInUser = await User.findById(user._id).
     select("-password -refreshToken");
+    // console.log(loggedInUser);
+    
 
     const options = {
         httpOnly :true,
@@ -136,7 +155,7 @@ const logInUser = asyncHandler(async (req,res) => {
     .json(
         new apiResponse(
             200,{
-                user: logInUser, refreshToken, accessToken
+                user: loggedInUser, refreshToken, accessToken
             },
             "User Logged in Successfully."
         )
@@ -144,8 +163,29 @@ const logInUser = asyncHandler(async (req,res) => {
 })
 
 const loggedOutUser = asyncHandler(async (req,res) => {
-    
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set : {
+                refreshToken: undefined
+            }
+        },
+        {
+            new :true
+        }
+    )
+
+    const options = {
+        httpOnly :true,
+        secure :true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(201, {}, "Successfully Logged-Out!")
 })
 
-export { loggedOutUser, logInUser, registerUser };
+export { loggedInUser, loggedOutUser, registerUser };
 
