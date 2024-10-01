@@ -185,7 +185,9 @@ const loggedOutUser = asyncHandler(async (req,res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(201, {}, "Successfully Logged-Out!")
+    .json(
+        new apiResponse(201, {}, "Successfully Logged-Out!")
+    )
 })
 
 const refreshAccessToken = asyncHandler(async (req,res) => {
@@ -261,8 +263,11 @@ const changeCurrentUserPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
     .status(200)
-    .json(200, res.user,"Current User Successfully Fetched.")
+    .json(
+        new apiResponse(200, res.user,"Current User Successfully Fetched.")
+    )
 })
+
 
 const updateAccountDetail = asyncHandler(async (req, res) => {
     const {fullName, email} = req.body;
@@ -271,7 +276,7 @@ const updateAccountDetail = asyncHandler(async (req, res) => {
         throw new apiError(400,"fullName or Email is Required..!");
     }
 
-    const user= User.findByIdAndUpdate(req.user?._id,{
+    const user= await User.findByIdAndUpdate(req.user?._id,{
         $set :{
             fullName,
             email: email,
@@ -281,7 +286,7 @@ const updateAccountDetail = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        200, user, "Account Details Updated Successfully..!"
+        new apiResponse(200, user, "Account Details Updated Successfully..!")
     )
 })
 
@@ -297,6 +302,9 @@ const updatedUserAvatar = asyncHandler(async (req, res) => {
     if (!avatar.url) {
         throw new apiError(400, "Error while uploading avatar on cloudinary..!");
     }
+
+    //TO DO: delete old image.-assignment 
+    //May be using unlink().
 
     await User.findByIdAndUpdate(
         req?.user._id,
