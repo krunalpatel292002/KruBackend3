@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { User } from "../models/users.models.js";
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
@@ -357,9 +358,135 @@ const updatedUserCoverImage = asyncHandler(async (req, res) => {
     )
 })
 
+const getUserChannelProfile = asyncHandler(async (req,res) => {
+    const {userName} = req.params;
+
+    if(!userName?.trim()){
+        throw new apiError(400,"UserName is Missing.");
+    }
+
+    const channel = await User.aggregate([
+        {
+            $match:{
+                userName : userName?.toLowerCase()
+            }
+        },
+        {
+            $lookup:{
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as:"subscribers"
+            }
+        },
+        {
+            $lookup:{
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as:"subscribedTo"
+            }
+        },
+        {
+            $addFields:{
+                subscribersCount :{
+                    $size: "$subscribers"
+                },
+                channelsSubscribedToCount: {
+                    $size: "$subscribedTo"
+                },
+                isSubscribed:{
+                    $cond: {
+                        if: {
+                            $in: [req.user?._id,"$subscribers.subscriber"]
+                        },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                fullName: 1,
+                userName:1,
+                subscribersCount:1,
+                channelsSubscribedToCount:1,
+                isSubscribed:1,
+                avatar:1,
+                coverImage: 1,
+                email: 1
+            }
+        }
+    ])
+    console.log(channel);
+    if (!channel?.length) {
+        throw new apiError(404,"channel Does Not Exist.");
+    }
+    
+    return res
+    .status(200)
+    .json(
+        new apiResponse(200, channel[0], "User Channel Fetched SuccessFully.")
+    )
+})
+
+const getWatchHistory = asyncHandler(async(req, res)=> {
+    const user = await User.aggregate([
+        {
+            $match:{
+                _id : new mongoose.Types.ObjectId(req.user._id),
+
+            }
+        },
+        {
+            $lookup : {
+                from : "Videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from : "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline:[
+                                {
+                                    $project:{
+                                        fullName:1, 
+                                        userName: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields:{
+                            owner:{
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new apiResponse(200, user[0].watchHistory,
+            "watch History Fetched SuccessFully."
+        )
+    )
+})
+
 export {
     changeCurrentUserPassword,
-    getCurrentUser, loggedInUser,
+    getCurrentUser, getUserChannelProfile, getWatchHistory, loggedInUser,
     loggedOutUser,
     refreshAccessToken, registerUser, updateAccountDetail, updatedUserAvatar, updatedUserCoverImage
 };
