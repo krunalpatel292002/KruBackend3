@@ -7,7 +7,6 @@ const videoSchema = new Schema(
         videoFile:{
             type:string,  //cloudnerry URL.
             required: true,
-            
         },
         thumbnail:{
             type:string,  //cloudnerry URL.
@@ -45,4 +44,4 @@ const videoSchema = new Schema(
 
 videoSchema.plugin(mongooseAggregatePaginate)
 
-export const Videos = mongoose.model("Video", videoSchema)
+export const Video = mongoose.model("Video", videoSchema)
