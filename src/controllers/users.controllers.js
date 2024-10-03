@@ -168,8 +168,11 @@ const loggedOutUser = asyncHandler(async (req,res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set : {
-                refreshToken: undefined
+            // $set : {
+            //     refreshToken: undefined
+            // }
+            $unset:{
+                refreshToken: 1 // this will remove the field from Document.
             }
         },
         {
@@ -486,8 +489,8 @@ const getWatchHistory = asyncHandler(async(req, res)=> {
 
 export {
     changeCurrentUserPassword,
-    getCurrentUser, getUserChannelProfile, getWatchHistory, loggedInUser,
+    getCurrentUser, getUserChannelProfile, loggedInUser,
     loggedOutUser,
-    refreshAccessToken, registerUser, updateAccountDetail, updatedUserAvatar, updatedUserCoverImage
+    refreshAccessToken, registerUser, updateAccountDetail, updatedUserAvatar, updatedUserCoverImage, getWatchHistory
 };
 
