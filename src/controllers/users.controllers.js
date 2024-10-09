@@ -78,7 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const coverImage= await uploadOnCloudinary(coverImageLocalPath)
 
     if(!avatar){
-        throw new apiError(400,"avatar file is Required")
+        throw new apiError(400,"somehow avatar file is not uploaded..!")
     }
 
     const user=await User.create({
@@ -489,8 +489,8 @@ const getWatchHistory = asyncHandler(async(req, res)=> {
 
 export {
     changeCurrentUserPassword,
-    getCurrentUser, getUserChannelProfile, loggedInUser,
+    getCurrentUser, getUserChannelProfile, getWatchHistory, loggedInUser,
     loggedOutUser,
-    refreshAccessToken, registerUser, updateAccountDetail, updatedUserAvatar, updatedUserCoverImage, getWatchHistory
+    refreshAccessToken, registerUser, updateAccountDetail, updatedUserAvatar, updatedUserCoverImage
 };
 

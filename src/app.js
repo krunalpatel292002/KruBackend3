@@ -24,12 +24,13 @@ app.use(cookieParser())
 //Routes import
 
 import userRouter from "./routes/users.routes.js";
+import videoRouter from "./routes/videos.routes.js";
 
 //Routes Declaration.
 
 app.use("/api/v1/users", userRouter)
 
-
+app.use("/api/v1/users/videos", videoRouter)
 
 
 
