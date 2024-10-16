@@ -16,7 +16,7 @@ router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
 router
     .route("/all-videos")
-    .get(verifyJWT,getAllVideos)
+    .get(getAllVideos)
 
 router
     .route("/upload-video")
@@ -34,14 +34,14 @@ router
         publishAVideo
     );
 
-router.route("/:videoId").get(verifyJWT,getVideoById)
+router.route("/:videoId").get(getVideoById)
 
-router.route("/:videoId/delete-video").delete(verifyJWT,deleteVideo)
+router.route("/:videoId/delete-video").delete(deleteVideo)
 
-router.route("/:videoId/update-thumbnail").patch(verifyJWT,upload.single("thumbnail"), updatethumbnailVideo);
+router.route("/:videoId/update-thumbnail").patch(upload.single("thumbnail"), updatethumbnailVideo);
 
-router.route("/:videoId/update-videoDetails").patch(verifyJWT, updateVideoDetails);
+router.route("/:videoId/update-videoDetails").patch( updateVideoDetails);
 
-router.route("/toggle/publish/:videoId/publish-status").patch(verifyJWT,togglePublishStatus);
+router.route("/toggle/publish/:videoId/publish-status").patch(togglePublishStatus);
 
 export default router

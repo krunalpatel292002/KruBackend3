@@ -114,7 +114,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
          throw new apiError(400, "Unable to retrieve video duration from Cloudinary response.");
      }
 
-    const videoFile =await Video.create({
+    const videoFile = await Video.create({
         title,
         videoFile: video.url,
         thumbnail: thumbnail?.url,
