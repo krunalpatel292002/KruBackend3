@@ -28,8 +28,10 @@ router.route("/create-playlist").post(
 router
     .route("/:playlistId")
     .get(getPlaylistById)
-    .patch(updatePlaylist)
-    .delete(deletePlaylist);
+
+router.route("/:playlistId").patch(upload.single("thumbnail"),updatePlaylist);
+
+router.route("/:playlistId").delete(deletePlaylist);
 
 router.route("/add/:videoId/:playlistId").patch(addVideoToPlaylist);
 router.route("/remove/:videoId/:playlistId").patch(removeVideoFromPlaylist);
