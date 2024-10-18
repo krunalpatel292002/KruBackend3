@@ -25,8 +25,10 @@ app.use(cookieParser())
 
 import { healthcheck } from './controllers/healthcheck.controller.js';
 import commentRouter from "./routes/comments.routes.js";
+import dashboardRouter from "./routes/dashboard.routes.js";
 import likeRouter from "./routes/likes.routes.js";
 import playlistRouter from "./routes/playlists.routes.js";
+import subscriptionsRouter from "./routes/subscriptions.routes.js";
 import tweetRouter from "./routes/tweets.routes.js";
 import userRouter from "./routes/users.routes.js";
 import videoRouter from "./routes/videos.routes.js";
@@ -50,5 +52,8 @@ app.use("/api/v1/comments", commentRouter)
 
 app.use("/api/v1/playlist", playlistRouter)
 
+app.use("/api/v1/subscriptions",subscriptionsRouter)
+
+app.use("/api/v1/dashboard",dashboardRouter)
 
 export { app };
